@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
+using Jarvis.AvatarService.Support;
 
 namespace Jarvis.AvatarService.Controllers
 {
@@ -16,31 +17,15 @@ namespace Jarvis.AvatarService.Controllers
     public class AvatarController : ApiController
     {
         [HttpGet]
-        [Route("{id}")]
-        public HttpResponseMessage Get(string id)
+        [Route("{userId}")]
+        public HttpResponseMessage Get(string userId, int size, string name)
         {
-            using (var rectangleFont = new Font("Arial", 36, FontStyle.Bold))
-            using (var bitmap = new Bitmap(90, 90, PixelFormat.Format24bppRgb))
-            using (var g = Graphics.FromImage(bitmap))
-            {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                var backgroundColor = Color.DeepSkyBlue;
-                g.Clear(backgroundColor);
-                g.DrawString(id, rectangleFont, Brushes.Beige, new PointF(4, 16));
+            var pathToFile = AvatarBuilder.CreateFor(userId, size, name);
 
-                using (var ms = new MemoryStream())
-                {
-                    bitmap.Save(ms, ImageFormat.Png);
-
-                    var result = new HttpResponseMessage(HttpStatusCode.OK)
-                    {
-                        Content = new ByteArrayContent(ms.ToArray())
-                    };
-                    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                    return result;
-                }
-            }
+            var result = new HttpResponseMessage(HttpStatusCode.OK);
+            result.Content = new StreamContent(new FileStream(pathToFile, FileMode.Open));
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+            return result;
         }
-
     }
 }

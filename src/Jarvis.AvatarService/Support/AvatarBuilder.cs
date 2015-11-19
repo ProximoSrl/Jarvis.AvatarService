@@ -7,33 +7,59 @@ using System.IO;
 
 namespace Jarvis.AvatarService.Support
 {
-    public class AvatarBuilder
+    public static class AvatarBuilder
     {
-        private string RootFolder { get; set; }
+        public static string RootFolder { get; set; }
 
-        public string CreateFor(string userId, int size, string fullname)
+        private static readonly Color[] Colors = new[] { 
+            Color.DeepSkyBlue, 
+            Color.DarkGreen, 
+            Color.CadetBlue,
+            Color.CornflowerBlue,
+            Color.DarkBlue,
+            Color.DarkSalmon,
+            Color.DarkCyan,
+            Color.DarkGoldenrod,
+            Color.DarkMagenta,
+            Color.DarkOrchid,
+        };
+
+        private static StringFormat _stringFormat;
+
+        static AvatarBuilder()
         {
-            if(String.IsNullOrWhiteSpace(fullname))
-                throw new Exception("Invalid name");
+            _stringFormat = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            };
+        }
 
+        public static string CreateFor(string userId, int size, string fullname)
+        {
             var initials = GetInitials(fullname);
-            //"root\\size\\userId_initials.png";
             var pathToFile = Path.Combine(RootFolder, size.ToString(), string.Format("{0}_{1}.png", userId, initials)).ToLowerInvariant();
 
+            if (File.Exists(pathToFile))
+                return pathToFile;
 
-            using (var rectangleFont = new Font("Arial", 36, FontStyle.Bold))
+            Directory.CreateDirectory(Path.GetDirectoryName(pathToFile));
+
             using (var bitmap = new Bitmap(size, size, PixelFormat.Format24bppRgb))
             using (var g = Graphics.FromImage(bitmap))
             {
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                var backgroundColor = Color.DeepSkyBlue;
+                var backgroundColor = GetColorFor(userId, fullname);
                 g.Clear(backgroundColor);
-                g.DrawString(initials, rectangleFont, Brushes.Beige, new PointF(4, 16));
 
-                using (var ms = new MemoryStream())
+                var units = GraphicsUnit.Pixel;
+
+                using (var rectangleFont = new Font("Arial", (int)(size/4), FontStyle.Bold))
                 {
-                    bitmap.Save(ms, ImageFormat.Png);
+                    g.DrawString(initials, rectangleFont, Brushes.Beige, bitmap.GetBounds(ref units), _stringFormat);
                 }
+
+                bitmap.Save(pathToFile, ImageFormat.Png);
             }
 
             return pathToFile;
@@ -41,6 +67,9 @@ namespace Jarvis.AvatarService.Support
 
         public static string GetInitials(string fullname)
         {
+            if (String.IsNullOrWhiteSpace(fullname))
+                throw new Exception("Invalid name");
+
             var tokens = fullname.ToUpperInvariant().Split(' ');
             string initials = tokens[0].Substring(0, 1);
             if (tokens.Length >= 3)
@@ -55,6 +84,12 @@ namespace Jarvis.AvatarService.Support
                 }
             }
             return initials;
+        }
+
+        public static Color GetColorFor(string userId, string fullName)
+        {
+            var hash = (Math.Abs(userId.GetHashCode() ^ fullName.GetHashCode())) % Colors.Length;
+            return Colors[hash];
         }
     }
 }
