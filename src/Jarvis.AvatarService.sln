@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jarvis.AvatarService", "Jarvis.AvatarService\Jarvis.AvatarService.csproj", "{32DFC402-F2B9-40F0-AF25-5BC292303558}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jarvis.AvatarService.Tests", "Jarvis.AvatarService.Tests\Jarvis.AvatarService.Tests.csproj", "{D407F199-0B31-4371-8F1E-7213A79C8FEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32DFC402-F2B9-40F0-AF25-5BC292303558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32DFC402-F2B9-40F0-AF25-5BC292303558}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32DFC402-F2B9-40F0-AF25-5BC292303558}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32DFC402-F2B9-40F0-AF25-5BC292303558}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D407F199-0B31-4371-8F1E-7213A79C8FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D407F199-0B31-4371-8F1E-7213A79C8FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D407F199-0B31-4371-8F1E-7213A79C8FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D407F199-0B31-4371-8F1E-7213A79C8FEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
