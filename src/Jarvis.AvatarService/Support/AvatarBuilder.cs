@@ -24,11 +24,11 @@ namespace Jarvis.AvatarService.Support
             Color.DarkOrchid,
         };
 
-        private static StringFormat _stringFormat;
+        private static readonly StringFormat Center;
 
         static AvatarBuilder()
         {
-            _stringFormat = new StringFormat
+            Center = new StringFormat
             {
                 Alignment = StringAlignment.Center,
                 LineAlignment = StringAlignment.Center
@@ -45,6 +45,47 @@ namespace Jarvis.AvatarService.Support
 
             Directory.CreateDirectory(Path.GetDirectoryName(pathToFile));
 
+            var original = Path.Combine(RootFolder, "avatars", userId + ".png");
+            if (File.Exists(original))
+            {
+                CreateAvatarWithImage(original, size, pathToFile);
+            }
+            else
+            {
+                CreateAvatarWithInitials(userId, size, fullname, initials, pathToFile);
+            }
+
+            return pathToFile;
+        }
+
+        private static void CreateAvatarWithImage(string sourceImage, int size, string pathToFile)
+        {
+            using (var image = Image.FromFile(sourceImage))
+            using (var newImage = ScaleImage(image, size, size))
+            {
+                newImage.Save(pathToFile, ImageFormat.Png);
+            }
+        }
+
+        private static Image ScaleImage(Image image, int maxWidth, int maxHeight)
+        {
+            var ratioX = (double)maxWidth / image.Width;
+            var ratioY = (double)maxHeight / image.Height;
+            var ratio = Math.Min(ratioX, ratioY);
+
+            var newWidth = (int)(image.Width * ratio);
+            var newHeight = (int)(image.Height * ratio);
+
+            var newImage = new Bitmap(newWidth, newHeight);
+
+            using (var graphics = Graphics.FromImage(newImage))
+                graphics.DrawImage(image, 0, 0, newWidth, newHeight);
+
+            return newImage;
+        }
+
+        private static void CreateAvatarWithInitials(string userId, int size, string fullname, string initials, string pathToFile)
+        {
             using (var bitmap = new Bitmap(size, size, PixelFormat.Format24bppRgb))
             using (var g = Graphics.FromImage(bitmap))
             {
@@ -54,15 +95,13 @@ namespace Jarvis.AvatarService.Support
 
                 var units = GraphicsUnit.Pixel;
 
-                using (var rectangleFont = new Font("Arial", (int)(size/4), FontStyle.Bold))
+                using (var rectangleFont = new Font("Arial", (int)(size / 4), FontStyle.Bold))
                 {
-                    g.DrawString(initials, rectangleFont, Brushes.Beige, bitmap.GetBounds(ref units), _stringFormat);
+                    g.DrawString(initials, rectangleFont, Brushes.Beige, bitmap.GetBounds(ref units), Center);
                 }
 
                 bitmap.Save(pathToFile, ImageFormat.Png);
             }
-
-            return pathToFile;
         }
 
         public static string GetInitials(string fullname)
