@@ -11,9 +11,9 @@ namespace Jarvis.AvatarService.Support
     {
         public static string RootFolder { get; set; }
 
-        private static readonly Color[] Colors = new[] { 
-            Color.DeepSkyBlue, 
-            Color.DarkGreen, 
+        private static readonly Color[] Colors = new[] {
+            Color.DeepSkyBlue,
+            Color.DarkGreen,
             Color.CadetBlue,
             Color.CornflowerBlue,
             Color.DarkBlue,
@@ -56,6 +56,17 @@ namespace Jarvis.AvatarService.Support
             }
 
             return pathToFile;
+        }
+
+        public static void CreateByStream(string userId, int size, string path, Stream stream)
+        {
+            using (var image = Image.FromStream(stream))
+            {
+                using (var newImage = ScaleImage(image, size, size))
+                {
+                    newImage.Save(path, ImageFormat.Png);
+                }
+            }
         }
 
         private static void CreateAvatarWithImage(string sourceImage, int size, string pathToFile)

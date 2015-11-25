@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Http;
 using Jarvis.AvatarService.Support;
+using System.Threading.Tasks;
 
 namespace Jarvis.AvatarService.Controllers
 {
@@ -26,6 +27,26 @@ namespace Jarvis.AvatarService.Controllers
             result.Content = new StreamContent(new FileStream(pathToFile, FileMode.Open));
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
             return result;
+        }
+
+        [HttpPost]
+        [Route("{userId}")]
+        public async Task<HttpResponseMessage> Post(String userId, int size, string name)
+        {
+            if (!Request.Content.IsMimeMultipartContent())
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, new Exception("File non valido!"));
+
+            try
+            {
+                var pathToFile = AvatarBuilder.CreateFor(userId, size, name);
+                MultipartFormDataStreamProvider provider = new MultipartFormDataStreamProvider(pathToFile);
+                await Request.Content.ReadAsMultipartAsync(provider);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
+            }
         }
     }
 }
