@@ -16,7 +16,8 @@ using System.Web;
 namespace Jarvis.AvatarService.Controllers
 {
     [RoutePrefix("api/avatar")]
-    public class AvatarController : AuthController
+    [Authorize]
+    public class AvatarController : ApiController
     {
         [HttpGet]
         [Route("{userId}")]
@@ -34,11 +35,6 @@ namespace Jarvis.AvatarService.Controllers
         [Route("{userId}")]
         public async Task<HttpResponseMessage> Post(String userId, int size)
         {
-            if (!IsAuthenticated(Request.Headers))
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Utente non abilitato!");
-            }
-
             if (!Request.Content.IsMimeMultipartContent())
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, new Exception("File non valido!"));
 
