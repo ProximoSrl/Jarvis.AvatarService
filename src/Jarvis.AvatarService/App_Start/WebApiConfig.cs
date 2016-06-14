@@ -40,6 +40,10 @@ namespace Jarvis.AvatarService
             {
                 Directory.CreateDirectory(AvatarBuilder.RootFolder);
             }
+            if (!Directory.Exists(AvatarBuilder.CustomRootFolder))
+            {
+                Directory.CreateDirectory(AvatarBuilder.CustomRootFolder);
+            }
         }
     }
 }

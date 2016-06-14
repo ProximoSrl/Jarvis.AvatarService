@@ -10,6 +10,10 @@ namespace Jarvis.AvatarService.Support
     public static class AvatarBuilder
     {
         public static string RootFolder { get; set; }
+        public static string CustomRootFolder
+        {
+            get { return Path.Combine(RootFolder, "avatars"); }
+        }
 
         private static readonly Color[] Colors = new[] {
             Color.DeepSkyBlue,
@@ -45,7 +49,7 @@ namespace Jarvis.AvatarService.Support
 
             Directory.CreateDirectory(Path.GetDirectoryName(pathToFile));
 
-            var original = Path.Combine(RootFolder, "avatars", userId + ".png");
+            var original = Path.Combine(CustomRootFolder, userId + ".png");
             if (File.Exists(original))
             {
                 CreateAvatarWithImage(original, size, pathToFile);
@@ -58,13 +62,20 @@ namespace Jarvis.AvatarService.Support
             return pathToFile;
         }
 
-        public static void CreateByStream(string userId, int size, string path, Stream stream)
+        /// <summary>
+        /// Creo un avatar da uno stream mettendolo nella cartella "Avatars"
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="size"></param>
+        /// <param name="stream"></param>
+        public static void CreateByStream(string userId, int size, Stream stream)
         {
+            var pathToFile = Path.Combine(CustomRootFolder, string.Format("{0}.png", userId)).ToLowerInvariant();
             using (var image = Image.FromStream(stream))
             {
                 using (var newImage = ScaleImage(image, size, size))
                 {
-                    newImage.Save(path, ImageFormat.Png);
+                    newImage.Save(pathToFile, ImageFormat.Png);
                 }
             }
         }

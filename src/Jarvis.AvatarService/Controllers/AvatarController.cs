@@ -11,11 +11,12 @@ using System.Net.Http.Headers;
 using System.Web.Http;
 using Jarvis.AvatarService.Support;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Jarvis.AvatarService.Controllers
 {
     [RoutePrefix("api/avatar")]
-    public class AvatarController : ApiController
+    public class AvatarController : AuthController
     {
         [HttpGet]
         [Route("{userId}")]
@@ -31,16 +32,45 @@ namespace Jarvis.AvatarService.Controllers
 
         [HttpPost]
         [Route("{userId}")]
-        public async Task<HttpResponseMessage> Post(String userId, int size, string name)
+        public async Task<HttpResponseMessage> Post(String userId, int size)
         {
+            if (!IsAuthenticated(Request.Headers))
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Utente non abilitato!");
+            }
+
             if (!Request.Content.IsMimeMultipartContent())
                 return Request.CreateErrorResponse(HttpStatusCode.BadRequest, new Exception("File non valido!"));
 
             try
             {
-                var pathToFile = AvatarBuilder.CreateFor(userId, size, name);
-                MultipartFormDataStreamProvider provider = new MultipartFormDataStreamProvider(pathToFile);
+                var path = HttpContext.Current.Server.MapPath("~/App_Data/temp");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                // Prepara lo streaming dei dati sul file corretto
+                MultipartFormDataStreamProvider provider = new MultipartFormDataStreamProvider(path);
+                // Sovrascrive il file con il nuovo avatar
                 await Request.Content.ReadAsMultipartAsync(provider);
+
+                var fileData = provider.FileData.FirstOrDefault();
+                if (fileData == null)
+                    throw new Exception("File not found!");
+                // Prendo il nome del file temporaneo
+                var fileName = fileData.Headers.ContentDisposition.FileName.Trim(Path.GetInvalidFileNameChars());
+                var localFileName = fileData.LocalFileName;
+
+                // Scrivo il nuovo file
+                using (var sr = File.OpenRead(localFileName))
+                {
+                    AvatarBuilder.CreateByStream(userId, size, sr);
+                }
+
+                // Elimino il file temp
+                File.Delete(localFileName);
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
