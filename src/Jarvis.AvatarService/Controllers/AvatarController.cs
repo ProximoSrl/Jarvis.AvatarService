@@ -21,6 +21,7 @@ namespace Jarvis.AvatarService.Controllers
     {
         [HttpGet]
         [Route("{userId}")]
+        [AllowAnonymous]
         public HttpResponseMessage Get(string userId, int size, string name)
         {
             var pathToFile = AvatarBuilder.CreateFor(userId, size, name);
