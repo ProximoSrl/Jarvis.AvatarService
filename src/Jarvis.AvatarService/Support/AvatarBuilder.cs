@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace Jarvis.AvatarService.Support
 {
@@ -76,6 +77,27 @@ namespace Jarvis.AvatarService.Support
                 using (var newImage = ScaleImage(image, size, size))
                 {
                     newImage.Save(pathToFile, ImageFormat.Png);
+                }
+            }
+            //Clear old image
+            ClearOld(userId, size);
+        }
+
+        private static void ClearOld(String userId, int size)
+        {
+            var dir = new DirectoryInfo(Path.Combine(RootFolder, size.ToString()));
+            if (dir.Exists)
+            {
+                var files = dir.GetFiles(String.Format("{0}_*", userId.ToLowerInvariant()));
+                if (files != null && files.Any())
+                {
+                    foreach (var file in files)
+                    {
+                        if (file.Exists)
+                        {
+                            File.Delete(file.FullName);
+                        }
+                    }
                 }
             }
         }
