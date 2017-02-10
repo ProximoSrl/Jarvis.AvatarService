@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -25,10 +21,22 @@ namespace Jarvis.AvatarService.Controllers
         public HttpResponseMessage Get(string userId, int size, string name)
         {
             var pathToFile = AvatarBuilder.CreateFor(userId, size, name);
+            var lastmodified = File.GetLastWriteTimeUtc(pathToFile);
+
+            // round to second 
+            lastmodified = new DateTime(
+                lastmodified.Ticks - (lastmodified.Ticks % TimeSpan.TicksPerSecond),
+                lastmodified.Kind
+            );
+
+            if (Request.Headers.IfModifiedSince.HasValue && lastmodified <= Request.Headers.IfModifiedSince.Value)
+                return new HttpResponseMessage(HttpStatusCode.NotModified);
 
             var result = new HttpResponseMessage(HttpStatusCode.OK);
             result.Content = new StreamContent(new FileStream(pathToFile, FileMode.Open));
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+            result.Content.Headers.LastModified = lastmodified;
+            result.Content.Headers.Expires = DateTime.UtcNow.AddMinutes(10);
             return result;
         }
 
