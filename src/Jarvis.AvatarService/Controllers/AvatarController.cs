@@ -8,6 +8,7 @@ using System.Web.Http;
 using Jarvis.AvatarService.Support;
 using System.Threading.Tasks;
 using System.Web;
+using WebApi.OutputCache.V2;
 
 namespace Jarvis.AvatarService.Controllers
 {
@@ -18,6 +19,7 @@ namespace Jarvis.AvatarService.Controllers
         [HttpGet]
         [Route("{userId}")]
         [AllowAnonymous]
+        [CacheOutput(ClientTimeSpan = 120, ServerTimeSpan = 120, MustRevalidate = true)]
         public HttpResponseMessage Get(string userId, int size, string name)
         {
             var pathToFile = AvatarBuilder.CreateFor(userId, size, name);
@@ -64,7 +66,6 @@ namespace Jarvis.AvatarService.Controllers
                 if (fileData == null)
                     throw new Exception("File not found!");
                 // Prendo il nome del file temporaneo
-                var fileName = fileData.Headers.ContentDisposition.FileName.Trim(Path.GetInvalidFileNameChars());
                 var localFileName = fileData.LocalFileName;
 
                 // Scrivo il nuovo file
