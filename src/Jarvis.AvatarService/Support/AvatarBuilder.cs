@@ -153,7 +153,10 @@ namespace Jarvis.AvatarService.Support
             if (String.IsNullOrWhiteSpace(fullname))
                 throw new Exception("Invalid name");
 
-            var tokens = fullname.ToUpperInvariant().Split(' ');
+            //If you not trim and fullname starts with space it throws.
+            var sanitizedFullName = fullname.Trim();
+
+            var tokens = sanitizedFullName.ToUpperInvariant().Split(' ');
             string initials = tokens[0].Substring(0, 1);
             if (tokens.Length >= 3)
             {
