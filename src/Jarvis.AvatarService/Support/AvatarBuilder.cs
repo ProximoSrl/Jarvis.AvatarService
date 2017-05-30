@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Jarvis.AvatarService.Support
 {
@@ -154,7 +155,7 @@ namespace Jarvis.AvatarService.Support
                 throw new Exception("Invalid name");
 
             //If you not trim and fullname starts with space it throws.
-            var sanitizedFullName = fullname.Trim();
+            var sanitizedFullName = Sanitize(fullname).Trim();
 
             var tokens = sanitizedFullName.ToUpperInvariant().Split(' ');
             string initials = tokens[0].Substring(0, 1);
@@ -176,6 +177,20 @@ namespace Jarvis.AvatarService.Support
         {
             var hash = (Math.Abs(userId.GetHashCode() ^ fullName.GetHashCode())) % Colors.Length;
             return Colors[hash];
+        }
+
+        private static String Sanitize(String stringToSanitize)
+        {
+            StringBuilder sb = new StringBuilder(stringToSanitize.Length);
+            foreach (var c in stringToSanitize)
+            {
+                if (Char.IsLetterOrDigit(c) || Char.IsWhiteSpace(c))
+                {
+                    sb.Append(c);
+                }
+            }
+            
+            return sb.ToString();
         }
     }
 }
