@@ -162,6 +162,11 @@ namespace Jarvis.AvatarService.Support
                 .Split(' ')
                 .Where(t => !String.IsNullOrEmpty(t))
                 .ToArray();
+            if (tokens.Length == 0)
+            {
+                //I have no token after sanitization, we have a string composed only by non char, non number
+                return new String(fullname.Trim().Take(2).ToArray());
+            }
             string initials = tokens[0].Substring(0, 1);
             if (tokens.Length >= 3)
             {
