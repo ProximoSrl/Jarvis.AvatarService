@@ -157,7 +157,11 @@ namespace Jarvis.AvatarService.Support
             //If you not trim and fullname starts with space it throws.
             var sanitizedFullName = Sanitize(fullname).Trim();
 
-            var tokens = sanitizedFullName.ToUpperInvariant().Split(' ');
+            var tokens = sanitizedFullName
+                .ToUpperInvariant()
+                .Split(' ')
+                .Where(t => !String.IsNullOrEmpty(t))
+                .ToArray();
             string initials = tokens[0].Substring(0, 1);
             if (tokens.Length >= 3)
             {
