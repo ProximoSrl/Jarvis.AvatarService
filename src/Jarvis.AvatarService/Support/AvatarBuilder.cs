@@ -44,7 +44,8 @@ namespace Jarvis.AvatarService.Support
         public static string CreateFor(string userId, int size, string fullname)
         {
             var initials = GetInitials(fullname);
-            var pathToFile = Path.Combine(RootFolder, size.ToString(), string.Format("{0}_{1}.png", userId, initials)).ToLowerInvariant();
+            var pathToFileSanitized = FileNameSanitize(initials);
+            var pathToFile = Path.Combine(RootFolder, size.ToString(), string.Format("{0}_{1}.png", userId, pathToFileSanitized)).ToLowerInvariant();
 
             if (File.Exists(pathToFile))
                 return pathToFile;
@@ -198,7 +199,26 @@ namespace Jarvis.AvatarService.Support
                     sb.Append(c);
                 }
             }
-            
+
+            return sb.ToString();
+        }
+
+        static Char[] invalidChars = Path.GetInvalidFileNameChars();
+
+        private static String FileNameSanitize(string stringToSanitize)
+        {
+            StringBuilder sb = new StringBuilder(stringToSanitize.Length);
+            foreach (var c in stringToSanitize)
+            {
+                if (invalidChars.Contains(c))
+                {
+                    sb.Append(((Int64)c).ToString());
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
             return sb.ToString();
         }
     }
