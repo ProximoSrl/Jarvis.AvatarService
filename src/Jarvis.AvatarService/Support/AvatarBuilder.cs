@@ -44,13 +44,14 @@ namespace Jarvis.AvatarService.Support
         public static string CreateFor(string userId, int size, string fullname)
         {
             var initials = GetInitials(fullname);
-            var pathToFileSanitized = FileNameSanitize(initials);
-            var pathToFile = Path.Combine(RootFolder, size.ToString(), string.Format("{0}_{1}.png", userId, pathToFileSanitized)).ToLowerInvariant();
+            var fileSizeFolder = Path.Combine(RootFolder, size.ToString());
+            var pathToFile = Path.Combine(fileSizeFolder, string.Format("{0}.png", userId)).ToLowerInvariant();
 
             if (File.Exists(pathToFile))
                 return pathToFile;
 
-            Directory.CreateDirectory(Path.GetDirectoryName(pathToFile));
+            if (!Directory.Exists(fileSizeFolder))
+                Directory.CreateDirectory(fileSizeFolder);
 
             var original = Path.Combine(CustomRootFolder, userId + ".png");
             if (File.Exists(original))
