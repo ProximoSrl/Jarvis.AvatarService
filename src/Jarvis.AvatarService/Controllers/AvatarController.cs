@@ -35,7 +35,7 @@ namespace Jarvis.AvatarService.Controllers
                 return new HttpResponseMessage(HttpStatusCode.NotModified);
 
             var result = new HttpResponseMessage(HttpStatusCode.OK);
-            result.Content = new StreamContent(new FileStream(pathToFile, FileMode.Open));
+            result.Content = new StreamContent(new FileStream(pathToFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
             result.Content.Headers.LastModified = lastmodified;
             result.Content.Headers.Expires = DateTime.UtcNow.AddMinutes(10);
