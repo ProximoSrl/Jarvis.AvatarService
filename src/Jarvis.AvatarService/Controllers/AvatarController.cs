@@ -14,6 +14,7 @@ namespace Jarvis.AvatarService.Controllers
 {
     [RoutePrefix("api/avatar")]
     [Authorize]
+    [AutoInvalidateCacheOutput]
     public class AvatarController : ApiController
     {
         [HttpGet]
