@@ -14,12 +14,13 @@ namespace Jarvis.AvatarService.Controllers
 {
     [RoutePrefix("api/avatar")]
     [Authorize]
+    [AutoInvalidateCacheOutput]
     public class AvatarController : ApiController
     {
         [HttpGet]
         [Route("{userId}")]
         [AllowAnonymous]
-        [CacheOutput(ClientTimeSpan = 120, ServerTimeSpan = 120, MustRevalidate = true)]
+        [CacheOutput(ClientTimeSpan = 18000, ServerTimeSpan = 18000)]
         public HttpResponseMessage Get(string userId, int size, string name)
         {
             var pathToFile = AvatarBuilder.CreateFor(userId, size, name);
