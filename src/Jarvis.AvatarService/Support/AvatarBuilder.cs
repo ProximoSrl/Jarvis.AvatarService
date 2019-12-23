@@ -12,9 +12,12 @@ namespace Jarvis.AvatarService.Support
     public static class AvatarBuilder
     {
         public static string RootFolder { get; set; }
+
+        public const string AVATARS_DIR = "avatars";
+
         public static string CustomRootFolder
         {
-            get { return Path.Combine(RootFolder, "avatars"); }
+            get { return Path.Combine(RootFolder, AVATARS_DIR); }
         }
 
         private static readonly Color[] Colors = new[] {
@@ -83,7 +86,26 @@ namespace Jarvis.AvatarService.Support
                 }
             }
             //Clear old image
-            ClearOld(userId, size);
+            ClearAllOld(userId);
+        }
+
+        /// <summary>
+        /// Clear all the images in the "size" folders referred to the passed userId
+        /// </summary>
+        /// <param name="userId"></param>
+        private static void ClearAllOld(String userId)
+        {
+            var dir = new DirectoryInfo(RootFolder);
+            if (dir.Exists)
+            {
+                int size = 0;
+                foreach (var sizeDirectory in dir
+                    .EnumerateDirectories("*", SearchOption.TopDirectoryOnly)
+                    .Where(d => !d.Name.Equals(AVATARS_DIR) && int.TryParse(d.Name, out size)))
+                {
+                    ClearOld(userId, size);
+                }
+            }
         }
 
         private static void ClearOld(String userId, int size)
@@ -91,7 +113,7 @@ namespace Jarvis.AvatarService.Support
             var dir = new DirectoryInfo(Path.Combine(RootFolder, size.ToString()));
             if (dir.Exists)
             {
-                var files = dir.GetFiles(String.Format("{0}_*", userId.ToLowerInvariant()));
+                var files = dir.GetFiles(String.Format("{0}*", userId.ToLowerInvariant()));
                 if (files != null && files.Any())
                 {
                     foreach (var file in files)
